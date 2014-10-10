@@ -1,6 +1,6 @@
 # Todolix
 ## What is it?
-Simple todolist implementation to explore Elixir as a choice in server-side technology. Additionally, I've used React for the frontend to see how it differs from traditional client-side MVC technology.
+Simple synchronized todolist implementation to explore Elixir as a choice in server-side technology. Additionally, I've used React for the frontend to see how it differs from traditional client-side MVC technology. Everyone who visits the page will receive events that indicate new todos have been added or todos have been removed, thereby keeping them in sync. 
 
 ## Installation
 To start todolix you must:
