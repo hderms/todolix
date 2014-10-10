@@ -10,9 +10,11 @@
 
     <title>Todos</title>
     <link rel="stylesheet" href="/css/app.css">
+    <link rel="stylesheet" href="/css/animation.css">
     <link rel="stylesheet" href="/css/bootstrap.min.css">
-    <script src="js/build/react.js"></script>
+    <script src="js/build/react-with-addons.js"></script>
     <script src="js/phoenix.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.js"></script>
     <script src="js/build/JSXTransformer.js"></script>
     <script src="http://code.jquery.com/jquery-1.10.0.min.js"></script>
 
@@ -26,6 +28,6 @@
     <!-- /container -->
 </body>
 
-<script src="js/build/helloworld.js"></script>
+<script src="js/build/todobox.js"></script>
 
 </html>

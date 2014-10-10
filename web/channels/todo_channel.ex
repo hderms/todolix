@@ -5,6 +5,10 @@ defmodule Todolix.TodoChannel do
   def join(socket, "new", message) do
     {:ok, socket}
   end
+def join(socket, "deleted", message) do
+    {:ok, socket}
+  end
+
   def join(socket, _no, _message) do
     IO.puts("Unauthorized connection")
     {:error, socket, :unauthorized}
@@ -19,26 +23,26 @@ defmodule Todolix.TodoChannel do
     broadcast("todo", "new", "new",  new_todo)
     socket
   end
-  def event(socket, "delete",  %{"uuid" => uuid} = params) do
+  def event(socket, "remove",  %{"uuid" => uuid} = params) do
     success = delete(uuid)
     IO.puts(inspect(params))
-    broadcast("todo", "delete", "delete",  uuid)
+    broadcast("todo", "deleted", "deleted",  %{uuid: uuid})
     socket
   end
 
   def event(socket, topic, message) do
+    message |> inspect |> IO.puts
     IO.puts("Massive failure")
     IO.puts(topic)
     socket
 end
 
   def create(conn,   %{"body" => body} = params) do
-    IO.puts(body)
     Todolix.Todolist.create_and_insert(@todolist_name, body)
   end
 
   defp delete(uuid) do
-    Todolix.Todolist.delete(uuid)
+    Todolix.Todolist.delete(@todolist_name, uuid)
   end
 
 end

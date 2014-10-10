@@ -1,4 +1,5 @@
 /** @jsx React.DOM */
+var ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
 var data =[];
 var TodoBox = React.createClass({
     getInitialState: function() {
@@ -20,10 +21,11 @@ var TodoBox = React.createClass({
         var socket = new Phoenix.Socket("/realtime")
         this.socket = socket;
         var that = this;
+        that.channel = {};
         socket.join("todo", "new", {}, function(channel) {
             console.log("connected");
             
-            that.channel = channel;
+            that.channel.create = channel;
             channel.on("new", function(new_message) {
                 console.log(new_message);
                 var todos = that.state.data;
@@ -37,9 +39,12 @@ var TodoBox = React.createClass({
         socket.join("todo", "deleted", {}, function(channel) {
             console.log("connected");
             
-            that.channel = channel;
+            that.channel.remove = channel;
             channel.on("deleted", function(new_message) {
                 //TODO: Must actually implement delete
+                var todos = that.state.data;
+                var were_removed = _.remove(todos, function(el) { return el.uuid == new_message.uuid});
+                that.setState({data: todos});
             });
             
             
@@ -48,36 +53,74 @@ var TodoBox = React.createClass({
 
     },
     handleTodoSubmit: function(message) { 
-        this.channel.send("new", 
+        this.channel.create.send("new", 
             message);
 
-    }
-    ,
+    },
+    handleTodoRemoval: function(uuid) {
+        this.channel.remove.send("remove", 
+        {uuid: uuid});
+
+
+    },
+    
     render: function() {
         return ( 
             <div className="todoBox">
             <TodoForm onTodoSubmit={this.handleTodoSubmit} />
-            <TodoList data={this.state.data}/> 
+            <br />
+            <div className="row-fluid">
+
+            <TodoList data={this.state.data} onTodoRemoval={this.handleTodoRemoval}/> 
+            </div>
 
             </div>
         );
     }
 });
+var Todo = React.createClass({
+    handleRemoval: function(e) {
+        console.log("Handle removal");
+        e.preventDefault();
+        console.log(this.props);
+        var uuid = this.props.todo.uuid
+        if (!uuid) {
+            return;
+        }
+        this.props.onTodoRemoval(uuid);
+        return;
+    }
+    ,
+    render: function() {
+        
+        return (<div key={this.props.todo.uuid} className="well" > 
+                <span>
+                {this.props.todo.body} 
+                 </span>
+                <span className="btn btn-danger btn-sm pull-right" onClick={this.handleRemoval}  data-uuid={this.props.todo.uuid}> x</span>
+                
+                </div>
+
+        )} 
+});
 var TodoList = React.createClass({
+
+    
+    onTodoRemoval: function(uuid) {
+        this.props.onTodoRemoval(uuid);
+
+    },
 
     render: function() {
         var todoNodes = this.props.data.map(function(todo) {
-            return ( 
-                <li> 
-                {todo.body} 
-                </li>
-            )
-        });
+            return  (<Todo todo={todo} onTodoRemoval={this.onTodoRemoval} />)
+        }.bind(this));
         return ( 
             
-            <ul className="todoList">
+            <div className="todoList" key="todolist">
             {todoNodes} 
-            </ul>
+
+            </div>
         )
     }
 });
