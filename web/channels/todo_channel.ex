@@ -1,8 +1,14 @@
 defmodule Todolix.TodoChannel do
   use Phoenix.Channel
+  @doc """
+    This channel is intended to provide a bi-directional communication point between webclients and the Todolix.Todolist agent.
+  """
   #global identifier for the todolist PID
   @todolist_name :todo_list
 
+  #join handling should succeed when the join is intended for a known
+  #channel.
+  #no form of authentication is required.
   def join(socket, "new", message) do
     {:ok, socket}
   end
@@ -14,6 +20,7 @@ defmodule Todolix.TodoChannel do
     {:error, socket, :unauthorized}
   end
 
+  #event handling for events received from webclients
   def event(socket, "new", %{body: ""}) do
     #Don't try to do anything if body is empty.  
     #Returning an error wasn't deemed necessary
@@ -39,6 +46,7 @@ defmodule Todolix.TodoChannel do
     socket
   end
 
+  #Helper functions to provide an abstraction over the Todolist interface
   def create(_, %{"body" => ""}) do
     raise ArgumentError, message: "Todo Channel can't create todo with an empty body"
   end
